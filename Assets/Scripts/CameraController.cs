@@ -4,32 +4,33 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     Bounds targetBound;
-    Vector3 offset;
+    //Vector3 offset;
 
     public List<Transform> targets;
+    public Camera cam;
     public float speed;
+    public float minZoom;
+    public float maxZoom;
 
     void Awake()
     {
-        offset = transform.position - targets[0].position;
-        targetBound = InitBound();
+        //offset = transform.position - targets[0].position;
+        UpdateBound();
     }
 
     void LateUpdate()
     {
-        transform.position = Vector3.Lerp(transform.position, targets[0].position + offset, Time.deltaTime * speed);
-        //transform.position = Vector3.Lerp(transform.position, targetBound.center, Time.deltaTime);
-        //Debug.Log(targetBound.center);
+        UpdateBound();
+        transform.position = Vector3.Lerp(transform.position, targetBound.center, Time.deltaTime * speed);
+        cam.orthographicSize = Mathf.Clamp(Mathf.Max(targetBound.size.x, targetBound.size.z) * 0.5f, minZoom, maxZoom);
     }
 
-    Bounds InitBound()
+    void UpdateBound()
     {
-        Bounds b = new Bounds(targets[0].position, new Vector3(1, 0, 1));
+        targetBound = new Bounds(targets[0].position, new Vector3(1, 0, 1));
         for(int i = 1; i < targets.Count; i++)
         {
             targetBound.Encapsulate(targets[i].position);
         }
-        return b;
-        Debug.Log(b.ToString());
     }
 }

@@ -5,13 +5,16 @@ using UnityEngine.UI;
 public class TankController : MonoBehaviour, IPowerable, IDamagable
 {
     Rigidbody rb;
-    float movementInput, turnInput, turnDamping;
+    float movementInput, turnInput;
     float nextBoost;
     float charge, chargeRatio;
     bool canLaunch;
+    string verticalInputName, horizontalInputName, boostInputName, launchInputName;
 
+    public int playerID;
     public float health;
     public float moveSpeed;
+    public float turnDamping;
     public float boostForce, boostCooldown;
     public float minLaunchForce, maxLaunchForce, launchCooldown;
     public GameObject shellPrefab;
@@ -24,8 +27,12 @@ public class TankController : MonoBehaviour, IPowerable, IDamagable
    
     void Awake()
     {
+        verticalInputName = "Vertical" + playerID.ToString();
+        horizontalInputName = "Horizontal" + playerID.ToString();
+        boostInputName = "Boost" + playerID.ToString();
+        launchInputName = "Launch" + playerID.ToString();
         movementInput = turnInput = 0;
-        turnDamping = 0.1f;
+        //turnDamping = 0.1f;
         nextBoost = Time.time;
         rb = GetComponent<Rigidbody>();
         boostSlider.maxValue = boostSlider.value = boostCooldown;
@@ -37,10 +44,10 @@ public class TankController : MonoBehaviour, IPowerable, IDamagable
 
     private void Update()
     {
-        movementInput = Input.GetAxis("Vertical");
-        turnInput = Input.GetAxis("Horizontal");
+        movementInput = Input.GetAxis(verticalInputName);
+        turnInput = Input.GetAxis(horizontalInputName);
 
-        if (Input.GetButtonDown("Boost") && nextBoost < Time.time)
+        if (Input.GetButtonDown(boostInputName) && nextBoost < Time.time)
         {
             nextBoost = Time.time + boostCooldown;
             boostSlider.value = 0.0f;
@@ -51,7 +58,7 @@ public class TankController : MonoBehaviour, IPowerable, IDamagable
         }
         boostSlider.value += Time.deltaTime;
 
-        if (Input.GetButtonDown("Launch") && canLaunch)
+        if (Input.GetButtonDown(launchInputName) && canLaunch)
         {
             canLaunch = false;
             StartCoroutine(Charge());
@@ -76,7 +83,7 @@ public class TankController : MonoBehaviour, IPowerable, IDamagable
     {
         while (charge < maxLaunchForce)
         {
-            if (!Input.GetButton("Launch"))
+            if (!Input.GetButton(launchInputName))
                 break;
             charge += chargeRatio * Time.deltaTime;
             launchSlider.value = charge - minLaunchForce;
@@ -99,7 +106,8 @@ public class TankController : MonoBehaviour, IPowerable, IDamagable
         switch (powerUpType)
         {
             case "speed":
-                moveSpeed *= 2;
+                moveSpeed *= 2f;
+                turnDamping *= 0.5f;
                 break;
             case "launch":
                 launchCooldown /= 2;
