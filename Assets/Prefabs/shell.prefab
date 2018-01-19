@@ -201,6 +201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifeSpan: 5
   explosionRadius: 2
+  safeCollider: {fileID: 0}
 --- !u!135 &135615103294977846
 SphereCollider:
   m_ObjectHideFlags: 1

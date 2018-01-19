@@ -4,6 +4,7 @@ public class Shell : MonoBehaviour
 {
     public float lifeSpan;
     public float explosionRadius;
+    public Collider safeCollider;
 
     private void Awake()
     {
@@ -16,7 +17,9 @@ public class Shell : MonoBehaviour
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
         for (int i = 0; i < colliders.Length; i++)
-        {   
+        {
+            if (colliders[i] == safeCollider)
+                continue;
             if(colliders[i].GetComponent<IDamagable>() != null)
             {
                 Debug.Log(colliders[i]);
